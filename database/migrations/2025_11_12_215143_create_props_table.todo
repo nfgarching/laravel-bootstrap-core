@@ -1,0 +1,54 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('props', function (Blueprint $table) {
+            $table->id();
+
+            $table->morphs('model');
+
+            $table->string('key')->nullable();   // Property key/name
+            $table->string('state')->nullable();  // z. B. "active", "error", "verified", "unverified", "pending"
+            $table->string('type')->nullable();  // z. B. "birth_date", "death_date", "iban"
+            $table->string('label')->nullable(); // z.B. "Privat", "Geschäftlich"
+            $table->string('value')->nullable(); // eigentliche Nummer oder Adresse
+            $table->json('data')->nullable();    // JSON-Feld für große Daten z.B. ...
+            $table->text('memo')->nullable();
+
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('props');
+    }
+};
+
+// https://spatie.be/docs/laravel-data/v4/getting-started/quickstart
+
+/* Props in div. models
+    documents
+    files
+    names
+    registers
+
+   Props->type
+    birthday : Geburtstag
+    deathday : Sterbetag
+    iban : Kontoverbindung
+    metadata : Daten als JSON-Datei gespeichert
+
+*/

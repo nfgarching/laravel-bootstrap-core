@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('dataset_entries', function (Blueprint $table) {
+            $table->id();
+
+            $table->morphs('owner'); // z.B. ChatSession, TextSession (FQCN)
+            $table->morphs('model'); // z.B. Akte, Dokument, Name, Register (FQCN)
+
+            // Kein Unique-Index: dasselbe Model darf mehrfach angehängt werden.
+            // Keine FK-Constraints: Ziele liegen teils auf der akv-Connection.
+            $table->string('label')->nullable();
+            $table->unsignedInteger('order')->default(0);
+
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('dataset_entries');
+    }
+};
