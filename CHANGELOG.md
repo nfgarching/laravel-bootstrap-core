@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- 2026-10-23: Rollenprüfung für die Package-Routen über
+  `Helpers\RouteRoles` und `config('app.route_roles')` (Gruppen `admin`,
+  `partner`, `user`); nur aktiv mit spatie/laravel-permission. Alias `role`
+  wird bei Bedarf vom `LibraryServiceProvider` registriert.
+  Siehe `docs/route-rollen.md`.
 - 2026-06-12: Blade-Komponenten per `Blade::anonymousComponentPath()` als
   `<x-core::...>` / `<x-core::...>` verfügbar.
 - 2026-06-12: `x-tags`-Header – jede Komponente deklariert ihre Tag-Aliase
@@ -17,6 +22,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+- 2026-10-23: Weiterleitung nach dem Login auf `startpage` statt `dashboard`.
+  Testseiten (`testpage`, `testform`, `testing`) nur noch mit Login und
+  Rollengruppe `admin`. Route `admin` wird ohne eigene `admin.blade.php` der
+  Anwendung wieder unter ihrem Namen registriert (vorher fälschlich als
+  zweite `dashboard`-Route).
 - 2026-10-21: Package von `nfgarching/components` in `nfgarching/core`
   umbenannt (PHP-Namespace `Nfgarching\Core`). Die beiden Komponenten-
   Verzeichnisse `resources/views/components/` und `src/Components/` sind

@@ -3,13 +3,24 @@
 namespace Nfgarching\Core\Controllers;
 
 use Illuminate\Support\Facades\Route;
+use Nfgarching\Core\Helpers\RouteRoles;
 use Nfgarching\Core\Livewire\Raw;
 
 Route::get('/greeting_from_bootstrap', function () {
     return response('Gruß vom Package Bootstrap');
 });
 
-Route::middleware('web')->group(function () {
+Route::middleware(['web', 'auth', ...RouteRoles::middleware('admin')])->group(function () {
+
+    if (file_exists(resource_path('views/admin.blade.php'))) {
+        Route::get('admin', function () {
+            return view('admin');
+        })->name('admin');
+    } else {
+        Route::get('admin', function () {
+            return view('page::admin');
+        })->name('admin');
+    }
 
     Route::get('testform', function () {
         return view('page::testform');
@@ -25,11 +36,7 @@ Route::middleware('web')->group(function () {
 
 });
 
-Route::middleware(['web', 'auth'])->group(function () {
-
-    Route::get('admin', function () {
-        return view('page::admin');
-    })->name('admin');
+Route::middleware(['web', 'auth', ...RouteRoles::middleware('partner')])->group(function () {
 
     if (file_exists(resource_path('views/dashboard.blade.php'))) {
         Route::get('dashboard', function () {
@@ -40,6 +47,24 @@ Route::middleware(['web', 'auth'])->group(function () {
             return view('page::dashboard');
         })->name('dashboard');
     }
+
+});
+
+Route::middleware(['web', 'auth', ...RouteRoles::middleware('user')])->group(function () {
+
+    // Route::get('admin', function () {
+    //     return view('page::admin');
+    // })->middleware(RouteRoles::middleware('admin'))->name('admin');
+
+    // if (file_exists(resource_path('views/dashboard.blade.php'))) {
+    //     Route::get('dashboard', function () {
+    //         return view('dashboard');
+    //     })->name('dashboard');
+    // } else {
+    //     Route::get('dashboard', function () {
+    //         return view('page::dashboard');
+    //     })->name('dashboard');
+    // }
 
     if (file_exists(resource_path('views/startpage.blade.php'))) {
         Route::get('startpage', function () {
@@ -64,13 +89,13 @@ Route::get('/welcome', function () {
     return view('welcome');
 })->name('welcome');
 
-Route::middleware(['web', 'auth'])->group(function () {
+Route::middleware(['web', 'auth', ...RouteRoles::middleware('user')])->group(function () {
 
     Route::get('/raw', Raw::class)->name('raw');
 
 });
 
-Route::middleware(['web', 'auth'])
+Route::middleware(['web', 'auth', ...RouteRoles::middleware('admin')])
     ->name('core.')->group(function () {
         Route::resource('props', PropController::class);
         Route::get('/props/{id}/action', [PropController::class, 'action'])->name('props.action');

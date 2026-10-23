@@ -6,6 +6,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
+use Nfgarching\Core\Helpers\RouteRoles;
 use Nfgarching\Core\Livewire\Counter;
 use Nfgarching\Core\Livewire\Modals\Field;
 use Nfgarching\Core\Livewire\Modals\Multi;
@@ -14,6 +15,7 @@ use Nfgarching\Core\Modals\ModalRegistry;
 use Nfgarching\Core\Navigation\NavbarNavigation;
 use Nfgarching\Core\Navigation\SidebarNavigation;
 use Nfgarching\Core\Traits\PublishesPackageMigrations;
+use Spatie\Permission\Middleware\RoleMiddleware;
 
 class LibraryServiceProvider extends ServiceProvider
 {
@@ -38,6 +40,12 @@ class LibraryServiceProvider extends ServiceProvider
         $this->publishesMigrations([
             __DIR__.'/../database/migrations' => database_path('migrations'),
         ], 'core-migrations');
+
+        // Die Routen nutzen 'role:…' (RouteRoles); den Alias auch dann
+        // bereitstellen, wenn die Anwendung ihn nicht selbst registriert.
+        if (RouteRoles::enabled() && ! array_key_exists('role', $this->app['router']->getMiddleware())) {
+            $this->app['router']->aliasMiddleware('role', RoleMiddleware::class);
+        }
 
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
 

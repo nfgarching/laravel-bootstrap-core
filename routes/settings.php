@@ -3,6 +3,7 @@
 namespace Nfgarching\Core\Controllers\Auth;
 
 use Illuminate\Support\Facades\Route;
+use Nfgarching\Core\Helpers\RouteRoles;
 
 // use Laravel\Fortify\Features;
 
@@ -33,7 +34,8 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::match(['get', 'post'], 'logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
 
-    Route::resource('settings', UserController::class)->only(['edit', 'update']);
+    Route::resource('settings', UserController::class)->only(['edit', 'update'])
+        ->middleware(RouteRoles::middleware('user'));
 
     // Route::get('/settings', [UserController::class, 'edit'])->name('user.settings');
     // Route::patch('/settings', [UserController::class, 'update'])->name('user.settings.update');

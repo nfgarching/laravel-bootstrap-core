@@ -57,7 +57,7 @@ class AuthControllerTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard'));
+        $response->assertRedirect(route('startpage'));
     }
 
     public function test_session_is_invalidated_on_logout(): void

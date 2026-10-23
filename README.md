@@ -79,7 +79,7 @@ und `props` muss die Anwendung selbst anlegen.
 ```text
 core/
 ├── composer.json
-├── config/app.php                   Konfiguration (start_page, version)
+├── config/app.php                   Konfiguration (start_page, version, route_roles)
 ├── docs/                            Detail-Dokumentation
 ├── routes/
 │   ├── web.php                      Routen
@@ -97,7 +97,7 @@ core/
 │   ├── LibraryServiceProvider.php
 │   ├── Controllers/                 PropController, Auth/
 │   ├── Database/                    PropFactory, PropsSeeder
-│   ├── Helpers/                     Config, DateTime, Paginate
+│   ├── Helpers/                     Config, DateTime, Paginate, RouteRoles
 │   ├── Livewire/                    Counter, Raw, Modals/Field, Modals/Multi
 │   ├── Modals/ModalRegistry.php
 │   ├── Models/                      Prop, DatasetEntry
@@ -111,30 +111,49 @@ core/
 
 ## Routen
 
-| Methode | URI | Name | Middleware |
-| --- | --- | --- | --- |
-| GET | `/welcome` | `welcome` | – |
-| GET | `/login` | `login` | guest |
-| POST | `/login` | – | guest |
-| GET | `/register` | `register` | guest |
-| POST | `/register` | – | guest |
-| GET/POST | `/logout` | `logout` | web |
-| GET | `/dashboard` | `dashboard` | web |
-| GET | `/startpage` | `startpage` | web |
-| GET | `/admin` | `admin` | web |
-| GET | `/guestpage` | `guestpage` | guest |
-| GET | `/testpage` | `testpage` | web |
-| GET | `/testform` | `testform` | web |
-| GET | `/testing` | `testing` | web |
-| GET | `/raw` | `raw` | auth |
-| GET | `/props` | `core.props.index` | auth |
-| GET | `/props/create` | `core.props.create` | auth |
-| POST | `/props` | `core.props.store` | auth |
-| GET | `/props/{prop}` | `core.props.show` | auth |
-| GET | `/props/{prop}/edit` | `core.props.edit` | auth |
-| PUT | `/props/{prop}` | `core.props.update` | auth |
-| DELETE | `/props/{prop}` | `core.props.destroy` | auth |
-| GET | `/props/{id}/action` | `core.props.action` | auth |
+Rollengruppe = zusätzliche `role:`-Middleware, sofern die Anwendung
+spatie/laravel-permission nutzt (siehe [Rollen](#rollen)).
+
+| Methode | URI | Name | Middleware | Rollengruppe |
+| --- | --- | --- | --- | --- |
+| GET | `/welcome` | `welcome` | – | – |
+| GET | `/login` | `login` | guest | – |
+| POST | `/login` | – | guest | – |
+| GET | `/register` | `register` | guest | – |
+| POST | `/register` | – | guest | – |
+| GET/POST | `/logout` | `logout` | auth | – |
+| GET | `/dashboard` | `dashboard` | auth | `partner` |
+| GET | `/startpage` | `startpage` | auth | `user` |
+| GET | `/admin` | `admin` | auth | `admin` |
+| GET | `/guestpage` | `guestpage` | guest | – |
+| GET | `/testpage` | `testpage` | auth | `admin` |
+| GET | `/testform` | `testform` | auth | `admin` |
+| GET | `/testing` | `testing` | auth | `admin` |
+| GET | `/raw` | `raw` | auth | `user` |
+| GET | `/settings/{setting}/edit` | `settings.edit` | auth | `user` |
+| PUT/PATCH | `/settings/{setting}` | `settings.update` | auth | `user` |
+| GET | `/props` | `core.props.index` | auth | `admin` |
+| GET | `/props/create` | `core.props.create` | auth | `admin` |
+| POST | `/props` | `core.props.store` | auth | `admin` |
+| GET | `/props/{prop}` | `core.props.show` | auth | `admin` |
+| GET | `/props/{prop}/edit` | `core.props.edit` | auth | `admin` |
+| PUT | `/props/{prop}` | `core.props.update` | auth | `admin` |
+| DELETE | `/props/{prop}` | `core.props.destroy` | auth | `admin` |
+| GET | `/props/{id}/action` | `core.props.action` | auth | `admin` |
+
+Nach dem Login geht es zur Startseite (`redirect()->intended(route('startpage'))`).
+
+### Rollen
+
+Ist [spatie/laravel-permission](https://spatie.be/docs/laravel-permission)
+installiert und nutzt das User-Model `HasRoles`, hängt
+`Nfgarching\Core\Helpers\RouteRoles::middleware('<gruppe>')` an die Routen
+`role:<Rollen>` an. Die Rollen je Gruppe legt die Anwendung in
+`config('app.route_roles')` fest. Ohne spatie oder ohne Rollen für eine Gruppe
+bleibt es bei `auth`. Fehlt der Alias `role`, registriert ihn der
+`LibraryServiceProvider`.
+
+Details, Konfiguration und Fallstricke: [docs/route-rollen.md](docs/route-rollen.md).
 
 ---
 
@@ -455,8 +474,19 @@ hardcodiert – jedes Feature-Package trägt seinen Bereich selbst über die
 return [
     'start_page' => 'page::dashboard',
     'version'    => '1.0.0',
+
+    // Rollen je Gruppe für die Package-Routen (nur mit spatie/laravel-permission)
+    'route_roles' => [
+        'admin' => 'Administrator',
+        'partner' => 'Administrator|Partner',
+        'user' => null,
+    ],
 ];
 ```
+
+Definiert die Anwendung `route_roles` selbst, ersetzt das die Vorgabe
+vollständig – dann alle Gruppen angeben (siehe
+[docs/route-rollen.md](docs/route-rollen.md)).
 
 ---
 
@@ -489,9 +519,10 @@ php artisan test --compact --filter=PropControllerTest
 
 ## Bekannte Hinweise
 
-**Test- und Demo-Routen** – `/testpage`, `/testform`, `/testing`, `/welcome`
-und `/greeting_from_bootstrap` werden ohne Login registriert. In produktiven
-Anwendungen gegebenenfalls über eigene Routen überschreiben.
+**Test- und Demo-Routen** – `/testpage`, `/testform` und `/testing` verlangen
+Login und die Rollengruppe `admin`. `/welcome` und `/greeting_from_bootstrap`
+werden weiterhin ohne Login registriert; in produktiven Anwendungen
+gegebenenfalls über eigene Routen überschreiben.
 
 **View-Überschreibung** – Layouts können in die Anwendung publiziert und überschrieben werden:
 
