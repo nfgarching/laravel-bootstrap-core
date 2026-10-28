@@ -33,6 +33,7 @@
             @switch($colType)
                 @case('bigint unsigned')
                 @case('bigint')
+                @case('bigint(20) unsigned')
 
                 @case('date')
                 @case('double(10,2)')
@@ -45,6 +46,7 @@
                 @case('varchar')
                 @case('varchar(8)')
                 @case('varchar(25)')
+                @case('varchar(191)')
                 @case('varchar(255)')
                     <input wire:model="{{ $field }}" {{ $attri }} class="form-control form-control-sm"
                         placeholder="{{ $label }}" type="text">
