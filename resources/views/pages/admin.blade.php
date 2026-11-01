@@ -102,6 +102,48 @@
                     </x-table>
                 </x-card>
 
+                {{-- Externe Tools: 'aktiv' => false, solange der Dienst nicht erreichbar ist (geprüft 2026-11-01) --}}
+                @php
+                    // guestpage nur für Gäste (leitet angemeldete User auf /dashboard), testpage: 500 – Komponente [alert] fehlt
+                    $tools = collect([
+                        ['label' => 'Guestpage', 'href' => '/guestpage', 'aktiv' => false],
+                        ['label' => 'Mailpit', 'href' => config('app.url') . ':8025', 'aktiv' => false],
+                        ['label' => 'Meilisearch', 'href' => config('app.url') . ':7700', 'aktiv' => false],
+                        ['label' => 'phpMyAdmin', 'href' => config('app.url') . ':9010', 'aktiv' => false],
+                        ['label' => 'Portainer', 'href' => config('app.url') . ':9000', 'aktiv' => false],
+                        ['label' => 'Telescope', 'href' => '/telescope', 'aktiv' => false],
+                        ['label' => 'Testing', 'href' => '/testing', 'aktiv' => true],
+                        ['label' => 'Testpage', 'href' => '/testpage', 'aktiv' => false],
+                        ['label' => 'Welcome', 'href' => '/welcome', 'aktiv' => true],
+                    ])->sortBy('label', SORT_NATURAL | SORT_FLAG_CASE);
+                    $tools = $tools->chunk((int) ceil($tools->count() / 2));
+                @endphp
+                <div class="card mt-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">Tools</h3>
+                        <i class="bi bi-tools"></i>
+                    </div>
+                    <div class="row g-0">
+                        @foreach ($tools as $spalte)
+                            <div class="col-6">
+                                <div class="list-group list-group-flush">
+                                    @foreach ($spalte as $tool)
+                                        @if ($tool['aktiv'])
+                                            <a class="list-group-item list-group-item-action" href="{{ $tool['href'] }}" target="_blank">
+                                                {{ __($tool['label']) }} <i class="bi bi-box-arrow-up-right small"></i>
+                                            </a>
+                                        @else
+                                            <span class="list-group-item disabled" aria-disabled="true">
+                                                {{ __($tool['label']) }} <small class="text-muted">(nicht verfügbar)</small>
+                                            </span>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
             </div>
 
             <div class="col-md-6">
