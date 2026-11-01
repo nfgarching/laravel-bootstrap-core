@@ -102,19 +102,25 @@
                     </x-table>
                 </x-card>
 
-                {{-- Externe Tools: 'aktiv' => false, solange der Dienst nicht erreichbar ist (geprüft 2026-11-01) --}}
+                {{-- Externe Tools: Erreichbarkeit prüft das Script unten live im Browser --}}
                 @php
-                    // guestpage nur für Gäste (leitet angemeldete User auf /dashboard), testpage: 500 – Komponente [alert] fehlt
                     $tools = collect([
-                        ['label' => 'Guestpage', 'href' => '/guestpage', 'aktiv' => false],
-                        ['label' => 'Mailpit', 'href' => config('app.url') . ':8025', 'aktiv' => false],
-                        ['label' => 'Meilisearch', 'href' => config('app.url') . ':7700', 'aktiv' => false],
-                        ['label' => 'phpMyAdmin', 'href' => config('app.url') . ':9010', 'aktiv' => false],
-                        ['label' => 'Portainer', 'href' => config('app.url') . ':9000', 'aktiv' => false],
-                        ['label' => 'Telescope', 'href' => '/telescope', 'aktiv' => false],
-                        ['label' => 'Testing', 'href' => '/testing', 'aktiv' => true],
-                        ['label' => 'Testpage', 'href' => '/testpage', 'aktiv' => false],
-                        ['label' => 'Welcome', 'href' => '/welcome', 'aktiv' => true],
+                        ['label' => 'Goolge', 'href' => 'https://www.google.com'],
+                        ['label' => 'Guestpage', 'href' => '/guestpage'],
+                        ['label' => 'Mailcatcher', 'href' => config('app.url') . ':1080'],
+                        ['label' => 'Mailpit', 'href' => config('app.url') . ':8025'],
+                        ['label' => 'Meilisearch', 'href' => config('app.url') . ':7700'],
+                        ['label' => 'phpMyAdmin', 'href' => config('app.url') . ':9010'],
+                        ['label' => 'Portainer', 'href' => config('app.url') . ':9000'],
+                        ['label' => 'Telescope', 'href' => '/telescope'],
+                        ['label' => 'Testing', 'href' => '/testing'],
+                        ['label' => 'Testpage', 'href' => '/testpage'],
+                        ['label' => 'Welcome', 'href' => '/welcome'],
+
+                        ['label' => 'Calls', 'href' => 'https://calls.froehler-kollegen.de/'],
+                        ['label' => 'Demoseite', 'href' => 'https://demo.phpmyoffice.de/'],
+                        ['label' => 'Testseite', 'href' => 'https://test.phpmyoffice.de/'],
+
                     ])->sortBy('label', SORT_NATURAL | SORT_FLAG_CASE);
                     $tools = $tools->chunk((int) ceil($tools->count() / 2));
                 @endphp
@@ -128,21 +134,49 @@
                             <div class="col-6">
                                 <div class="list-group list-group-flush">
                                     @foreach ($spalte as $tool)
-                                        @if ($tool['aktiv'])
-                                            <a class="list-group-item list-group-item-action" href="{{ $tool['href'] }}" target="_blank">
-                                                {{ __($tool['label']) }} <i class="bi bi-box-arrow-up-right small"></i>
-                                            </a>
-                                        @else
-                                            <span class="list-group-item disabled" aria-disabled="true">
-                                                {{ __($tool['label']) }} <small class="text-muted">(nicht verfügbar)</small>
-                                            </span>
-                                        @endif
+                                        <a class="list-group-item list-group-item-action disabled" href="{{ $tool['href'] }}" target="_blank" aria-disabled="true" data-tool-check>
+                                            {{ __($tool['label']) }}
+                                            <small class="text-muted" data-tool-status>(prüfe …)</small>
+                                        </a>
                                     @endforeach
                                 </div>
                             </div>
                         @endforeach
                     </div>
                 </div>
+
+                <script>
+                    // Eigene Seiten: nur 2xx gilt als erreichbar (Weiterleitung, z.B. Guestpage → Dashboard, nicht).
+                    // Fremde Ports: no-cors liefert keinen Status, aber eine Antwort überhaupt heißt "Dienst läuft".
+                    (() => {
+                        const check = async (link) => {
+                            const url = new URL(link.href);
+                            const sameOrigin = url.origin === location.origin;
+                            const signal = AbortSignal.timeout(4000);
+                            try {
+                                if (sameOrigin) {
+                                    const res = await fetch(url, { redirect: 'manual', signal });
+                                    return res.ok;
+                                }
+                                await fetch(url, { mode: 'no-cors', signal });
+                                return true;
+                            } catch {
+                                return false;
+                            }
+                        };
+
+                        document.querySelectorAll('[data-tool-check]').forEach(async (link) => {
+                            const status = link.querySelector('[data-tool-status]');
+                            if (await check(link)) {
+                                link.classList.remove('disabled');
+                                link.removeAttribute('aria-disabled');
+                                status.outerHTML = '<i class="bi bi-box-arrow-up-right small"></i>';
+                            } else {
+                                status.textContent = '(nicht verfügbar)';
+                            }
+                        });
+                    })();
+                </script>
 
             </div>
 
