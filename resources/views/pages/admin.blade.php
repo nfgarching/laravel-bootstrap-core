@@ -118,6 +118,8 @@
                         ['label' => 'Welcome', 'href' => '/welcome'],
 
                         ['label' => 'Calls', 'href' => 'https://calls.froehler-kollegen.de/'],
+                        ['label' => 'Download', 'href' => 'https://download.froehler-kollegen.de/'],
+
                         ['label' => 'Demoseite', 'href' => 'https://demo.phpmyoffice.de/'],
                         ['label' => 'Testseite', 'href' => 'https://test.phpmyoffice.de/'],
 
