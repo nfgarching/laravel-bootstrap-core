@@ -117,11 +117,12 @@
                         ['label' => 'Testpage', 'href' => '/testpage'],
                         ['label' => 'Welcome', 'href' => '/welcome'],
 
-                        ['label' => 'Calls', 'href' => 'https://calls.froehler-kollegen.de/'],
-                        ['label' => 'Download', 'href' => 'https://download.froehler-kollegen.de/'],
+                        ['label' => 'Calls', 'href' => 'https://calls.froehler-kollegen.de'],
+                        ['label' => 'Download', 'href' => 'https://download.froehler-kollegen.de'],
+                        ['label' => 'Telephony', 'href' => 'https://telephony.froehler-kollegen.de'],
 
-                        ['label' => 'Demoseite', 'href' => 'https://demo.phpmyoffice.de/'],
-                        ['label' => 'Testseite', 'href' => 'https://test.phpmyoffice.de/'],
+                        ['label' => 'Demoseite', 'href' => 'https://demo.phpmyoffice.de'],
+                        ['label' => 'Testseite', 'href' => 'https://test.phpmyoffice.de'],
 
                     ])->sortBy('label', SORT_NATURAL | SORT_FLAG_CASE);
                     $tools = $tools->chunk((int) ceil($tools->count() / 2));
