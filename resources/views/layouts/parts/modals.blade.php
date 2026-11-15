@@ -28,6 +28,7 @@
 {{-- <livewire:modal.test /> --}}
 {{-- <livewire:modal.upload /> --}}
 <livewire:modal.multi /> {{-- \Nfgarching\Core\Livewire\Modals\Multi --}}
+@include('layout::parts.modal-frame') {{-- iframe-Modal für <x-button.dispatch frame> --}}
 {{-- \Nfgarching\Core\Livewire\Modals\Field --}}
 
 {{-- @if (class_exists(\Nfgarching\Mails\Livewire\Compose::class) && ! request()->routeIs('mail.compose'))

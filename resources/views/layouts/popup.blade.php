@@ -9,6 +9,18 @@
 
 <body>
 
+    {{-- Im iframe-Modal (layout::parts.modal-frame): <html class="in-frame">, so früh
+         wie möglich, damit kein Leerraum aufblitzt. Elemente mit .frame-hide (z. B. der
+         Abstand oben für das Popup) entfallen dort. --}}
+    <script>
+        if (window.self !== window.top) {
+            document.documentElement.classList.add('in-frame');
+        }
+    </script>
+    <style>
+        html.in-frame .frame-hide { display: none !important; }
+    </style>
+
     {{-- @if (file_exists(resource_path('views/layouts/parts/navbar.blade.php')))
         @include('layouts.parts.navbar')
     @else
@@ -58,6 +70,20 @@
     @else
         @include('layout::parts.script')
     @endif
+
+    {{-- Im iframe-Modal (layout::parts.modal-frame): Links mit data-frame-close
+         (z. B. „Abbrechen“) schließen das Modal, statt im iframe zu navigieren. --}}
+    <script>
+        if (window.self !== window.top) {
+            document.addEventListener('click', function (event) {
+                const link = event.target.closest('[data-frame-close]');
+                if (link && typeof window.parent.closeFrameModal === 'function') {
+                    event.preventDefault();
+                    window.parent.closeFrameModal();
+                }
+            });
+        }
+    </script>
 
 </body>
 

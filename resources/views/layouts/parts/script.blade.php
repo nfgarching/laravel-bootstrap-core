@@ -30,6 +30,17 @@
      plain Funktion auf window (keine Alpine-Magic), damit sie auch außerhalb
      jeder Alpine-/Livewire-Wurzel funktioniert (z.B. in der Navbar). --}}
 <script>
+    // Neuer Tab im Vordergrund: Chrome öffnet window.open() bei gedrückter
+    // STRG-Taste (wie STRG-Klick auf einen Link) im Hintergrund. Erst nach dem
+    // Klick-Event öffnen – die Nutzer-Aktivierung gilt weiter, der Popup-Blocker
+    // greift nicht – und den Tab fokussieren.
+    window.openTab = function (url) {
+        setTimeout(function () {
+            const w = window.open(url, '_blank');
+            if (w) { w.focus(); }
+        }, 0);
+    };
+
     window.openPopup = function (url, opts) {
         if (!opts) { return window.open(url, '_blank'); }
         const p = Object.fromEntries(opts.split(',').map(e => e.split('=')));
