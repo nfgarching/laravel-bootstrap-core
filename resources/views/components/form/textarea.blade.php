@@ -8,8 +8,7 @@
     'item' => \Illuminate\Support\Facades\View::shared('__bindModel'),
     'readonly' => false,
     'value'    => '',
-    // field special
-    'rows'     => '5',
+    // field special: Höhe per CSS, rows wirkt in .form-floating nicht
     'height' => '150px',
 ])
 
@@ -28,14 +27,13 @@
 <div class="form-floating @error($field) is-invalid @enderror">
     
     <textarea  {{ $attri }}
-        class="form-control @error($field) is-invalid @enderror"
+        class="{{ $class }} @error($field) is-invalid @enderror"
         @if ($disabled) disabled @endif
-        placeholder="{{ $label }}" 
+        placeholder="{{ $label }}"
         id="floatingInput-{{ $field }}"
         name="{{ $field }}"
         @if ($readonly) readonly @endif
-        {{-- field special --}}
-        style="height: 233px"
+        style="height: {{ $height }}"
     >{{ $slot }}</textarea>
     
     <label for="floatingInput-{{ $field }}">{{ $label }}</label>
