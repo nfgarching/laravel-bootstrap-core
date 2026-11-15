@@ -26,7 +26,7 @@
                  (Kartenkopf). Der Titel landet nur in aria-label. Schließen-Button oben rechts. --}}
             <button type="button" class="btn-close position-absolute top-0 end-0 m-2" style="z-index:1"
                 data-bs-dismiss="modal" aria-label="Schließen"></button>
-            <div class="modal-body" style="padding:2.5rem 0">
+            <div class="modal-body" style="padding:2.5rem">
                 <iframe id="modalFrameIframe" src="about:blank"
                     style="width:100%;height:200px;border:0;display:block"></iframe>
             </div>

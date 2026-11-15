@@ -71,6 +71,57 @@
         @include('layout::parts.script')
     @endif
 
+    {{-- Abschluss einer Popup-Seite (z. B. Datei-Import/-Upload, beA-Übernahme), im Popup wie im
+         iframe-Modal (layout::parts.modal-frame):
+           inOpener = true  => aufrufende Seite auf url (Popup: window.opener,
+                               Modal: Hauptfenster), Popup bzw. Modal schließen
+           inOpener = false => url in neuem Tab, Popup bzw. Modal schließen
+         Ohne Opener (z. B. per CTRL als Tab geöffnet) => url im selben Fenster. --}}
+    <script>
+        window.finishPopup = function (url, inOpener) {
+            if (window.self !== window.top) {
+                if (inOpener) {
+                    window.top.location.href = url;
+                } else {
+                    window.top.open(url, '_blank');
+                    window.parent.closeFrameModal && window.parent.closeFrameModal();
+                }
+                return;
+            }
+            if (inOpener && window.opener && !window.opener.closed) {
+                window.opener.location.href = url;
+                window.opener.focus();
+                window.close();
+                return;
+            }
+            if (inOpener) {
+                window.location.href = url;
+                return;
+            }
+            window.open(url, '_blank');
+            window.close();
+        };
+
+        // Abschluss ohne Ziel-URL: aufrufende Seite neu laden (Modal: Hauptfenster,
+        // Popup: window.opener) und Popup bzw. Modal schließen. Ohne Opener wird
+        // fallbackUrl geöffnet (z. B. eine Übersicht).
+        window.reloadOpener = function (fallbackUrl) {
+            if (window.self !== window.top) {
+                window.top.location.reload();
+                return;
+            }
+            if (window.opener && !window.opener.closed) {
+                window.opener.location.reload();
+                window.opener.focus();
+                window.close();
+                return;
+            }
+            if (fallbackUrl) {
+                window.location.href = fallbackUrl;
+            }
+        };
+    </script>
+
     {{-- Im iframe-Modal (layout::parts.modal-frame): Links mit data-frame-close
          (z. B. „Abbrechen“) schließen das Modal, statt im iframe zu navigieren. --}}
     <script>
