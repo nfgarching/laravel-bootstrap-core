@@ -102,6 +102,16 @@
             window.close();
         };
 
+        // Abschluss ohne Ziel und ohne Neuladen (z. B. Mail-Import, der im
+        // Hintergrund weiterläuft): Modal bzw. Popup schließen.
+        window.closePopup = function () {
+            if (window.self !== window.top) {
+                window.parent.closeFrameModal && window.parent.closeFrameModal();
+                return;
+            }
+            window.close();
+        };
+
         // Abschluss ohne Ziel-URL: aufrufende Seite neu laden (Modal: Hauptfenster,
         // Popup: window.opener) und Popup bzw. Modal schließen. Ohne Opener wird
         // fallbackUrl geöffnet (z. B. eine Übersicht).
