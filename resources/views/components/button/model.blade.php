@@ -12,6 +12,9 @@
     // dump($model::getShowRouteName());
     $modelName = Str::lower(class_basename($model)); // z.B. "Document", "Name", "File"
     switch ($modelName) {
+        case 'beamessage':
+            $routeName = 'bea';
+            break;
         case 'dokument':
             $routeName = 'dokumente';
             break;
