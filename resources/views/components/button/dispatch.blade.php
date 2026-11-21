@@ -20,6 +20,9 @@
       - frameSize string  Breite des iframe-Modals: sm | lg | xl (Default) | fullscreen;
                           die Höhe folgt dem Inhalt
       - ctrlHref  string  Ziel bei Ctrl statt neuem Tab, z.B. 'mailto:…' (optional)
+      - popupData array   zusätzliche Query-Parameter nur für Modal und Popup, nicht für
+                          den Ctrl-Tab – z.B. ['popup' => 1]: Modal/SHIFT im Popup-Layout,
+                          CTRL im App-Layout (die Zielseite wertet den Parameter aus)
       - popup     string  window.open-Features (z.B. 'width=800,height=800')
       - class     string  Bootstrap-Varianten: button, nav-link
       - type      string  Bootstrap-Variante (btn-{type}), Default 'primary'
@@ -41,6 +44,7 @@
     'frame' => false,
     'frameSize' => 'xl',
     'ctrlHref' => '',
+    'popupData' => [],
 ])
 
 @php
@@ -55,6 +59,8 @@
     }
     $urlData = array_map(fn($val) => is_array($val) ? json_encode($val) : $val, $data);
     $href = url()->query($href, $urlData);
+    // Ctrl öffnet $href (Tab), Modal und Popup $popupHref (ggf. mit popupData)
+    $popupHref = $popupData ? url()->query($href, $popupData) : $href;
     $frameTitle = json_encode((string) ($data['title'] ?? ''), JSON_UNESCAPED_UNICODE | JSON_HEX_QUOT | JSON_HEX_APOS);
     // Tastenhinweise stehen immer im Tooltip; ein eigener Text-Tooltip wird zur
     // Überschrift. Ein HTML-Tooltip (enthält „<“) bringt seine Hinweise selbst mit
@@ -82,13 +88,13 @@
         if (event.ctrlKey) { openTab('{{ $href }}'); }
         @endif
         @if ($frame)
-        else if (event.shiftKey) { openPopup('{{ $href }}', '{{ $popup }}'); }
-        else { openFrameModal('{{ $href }}', {{ $frameTitle }}, '{{ $frameSize }}'); }
+        else if (event.shiftKey) { openPopup('{{ $popupHref }}', '{{ $popup }}'); }
+        else { openFrameModal('{{ $popupHref }}', {{ $frameTitle }}, '{{ $frameSize }}'); }
         @elseif ($modalName)
-        else if (event.shiftKey) { openPopup('{{ $href }}', '{{ $popup }}'); }
+        else if (event.shiftKey) { openPopup('{{ $popupHref }}', '{{ $popup }}'); }
         else { Livewire.dispatch('{{ $modalName }}', { data: { {{ $arr }} } }); }
         @else
-        else { openPopup('{{ $href }}', '{{ $popup }}'); }
+        else { openPopup('{{ $popupHref }}', '{{ $popup }}'); }
         @endif
     ">
 

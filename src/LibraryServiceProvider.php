@@ -28,6 +28,11 @@ class LibraryServiceProvider extends ServiceProvider
     {
         Paginator::useBootstrapFive();
 
+        // @btndate($datum): Kurzdatum für Listen-Buttons (H:i / d.m / m/y),
+        // siehe DateTime::btndate(). Im core, damit Packages sie ohne die
+        // BladeHelpers der Anwendung nutzen können.
+        Blade::directive('btndate', fn (string $expression): string => "<?php echo e(\\Nfgarching\\Core\\Helpers\\DateTime::btndate($expression)); ?>");
+
         $this->bootComponents();
         $this->bootLivewire();
 

@@ -5,7 +5,8 @@
 ])
 
 <tr></tr>
-<tr class="accordion-collapse collapse"
+{{-- Zusätzliche Attribute (z. B. class="show" für serverseitig aufgeklappte Zeilen, wire:key) landen am <tr> --}}
+<tr {{ $attributes->merge(['class' => 'accordion-collapse collapse']) }}
     data-bs-parent="#{{ $acc_id }}"
     id="collapse{{ $acc_id . $row_id }}"
 >

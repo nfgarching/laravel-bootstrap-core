@@ -2,13 +2,30 @@
 
 namespace Nfgarching\Core\Helpers;
 
+use DateTimeInterface;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Number;
 
 class DateTime
 {
-    public static function btndate($datetime)
+    /**
+     * Kurzdatum für Listen-Buttons (Blade: @btndate): heute „H:i“, im Jahr
+     * um heute „d.m“, sonst „m/y“. Carbon-Werte (z. B. UTC-gespeicherte
+     * datetime-Casts) werden vorher in die App-Zeitzone umgerechnet.
+     */
+    public static function btndate(DateTimeInterface|string|null $datetime): string
     {
-        return 'Hallo';
+        if ($datetime === null || $datetime === '') {
+            return '';
+        }
+
+        if ($datetime instanceof DateTimeInterface) {
+            $datetime = Carbon::instance($datetime)
+                ->timezone(config('app.timezone'))
+                ->format('Y-m-d H:i:s');
+        }
+
+        return self::get_btn_date($datetime);
     }
 
     public static function get_btn_date($datetime)

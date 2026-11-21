@@ -26,7 +26,7 @@
                  (Kartenkopf). Der Titel landet nur in aria-label. Schließen-Button oben rechts. --}}
             <button type="button" class="btn-close position-absolute top-0 end-0 m-2" style="z-index:1"
                 data-bs-dismiss="modal" aria-label="Schließen"></button>
-            <div class="modal-body" style="padding:2.5rem">
+            <div class="modal-body" id="modalFrameBody" style="padding:2.5rem">
                 <iframe id="modalFrameIframe" src="about:blank"
                     style="width:100%;height:200px;border:0;display:block"></iframe>
             </div>
@@ -44,12 +44,17 @@
         const modalEl = document.getElementById('modalFrame');
         const dialog = modalEl.querySelector('.modal-dialog');
         const iframe = document.getElementById('modalFrameIframe');
+        const body = document.getElementById('modalFrameBody');
+        // fullscreen: schmaler Rand (oben Platz für den Schließen-Button), damit
+        // der Inhalt (z. B. eine Dateivorschau) fast die ganze Fensterhöhe bekommt
+        const PADDING = { normal: '2.5rem', fullscreen: '2rem 0.5rem 0.5rem' };
         let observer = null;
 
-        // Platz für den Dialog-Rand und den Abstand im modal-body (je 2.5rem = 40px oben/unten)
+        // Platz für den Dialog-Rand und den Abstand im modal-body
+        // (normal je 2.5rem = 40px oben/unten, fullscreen 2rem + 0.5rem = 40px)
         function maxHeight() {
             return dialog.classList.contains('modal-fullscreen')
-                ? window.innerHeight - 80
+                ? window.innerHeight - 40
                 : window.innerHeight - 160;
         }
 
@@ -95,6 +100,7 @@
             size = SIZES.includes('modal-' + size) ? 'modal-' + size : 'modal-xl';
             dialog.classList.remove(...SIZES);
             dialog.classList.add(size);
+            body.style.padding = size === 'modal-fullscreen' ? PADDING.fullscreen : PADDING.normal;
             modalEl.setAttribute('aria-label', title || '');
             iframe.style.height = '200px';
             fitFrame();
