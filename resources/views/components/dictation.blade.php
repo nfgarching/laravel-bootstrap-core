@@ -59,7 +59,10 @@
         <li>
             <button type="button" class="dropdown-item d-flex align-items-center" :disabled="!speechAvailable"
                 :class="preferred === 'speech' && 'active'" :aria-current="preferred === 'speech'"
-                :title="speechAvailable ? '' : 'Nur in Chrome/Edge verfügbar'" @click="choose('speech')">
+                :title="speechAvailable ? '' : (secure
+                    ? 'Nur in Chrome/Edge verfügbar'
+                    : 'Mikrofon nicht verfügbar – HTTPS oder localhost erforderlich')"
+                @click="choose('speech')">
                 <i class="bi bi-soundwave me-2"></i> Live-Diktat (Browser)
                 <i class="bi bi-check-lg ms-auto ps-3" x-show="preferred === 'speech'"></i>
             </button>

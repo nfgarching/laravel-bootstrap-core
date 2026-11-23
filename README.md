@@ -417,6 +417,61 @@ $this->dispatch('openModalRaw', model: \App\Models\Dokument::class, id: $id);
 
 ---
 
+## Diktat (`<x-dictation>`)
+
+Split-Button „Diktat ▾“ für ein Textfeld. Er bietet zwei Modi:
+
+- **Live-Diktat** über die Web Speech API, nur in Chrome und Edge. Der Text
+  erscheint schon während des Sprechens.
+- **Aufnehmen & transkribieren (KI)**: Der Browser nimmt Audio auf, lädt es per
+  Livewire hoch und lässt es über den gebundenen `AudioTranscriber`
+  transkribieren, im textbot-Package z. B. über Gemini.
+
+```blade
+<x-dictation target="#mein-textfeld" transcribe />
+```
+
+`transcribe` nur setzen, wenn die umgebende Livewire-Komponente
+`Nfgarching\Core\Traits\TranscribesDictation` und `WithFileUploads` nutzt. Der
+KI-Modus erscheint nur, wenn ein `Nfgarching\Core\Contracts\AudioTranscriber`
+gebunden ist, z. B. durch den textbot. Beispiel: `Livewire/Modals/Field.php`.
+
+### Mikrofon nur über HTTPS oder localhost
+
+Browser geben das Mikrofon nur über **HTTPS** oder über **`http://localhost`**
+frei. Wird die Anwendung per HTTP über eine IP-Adresse oder einen Hostnamen
+aufgerufen (z. B. `http://192.168.x.y:8000`), bietet der Browser gar keinen
+Mikrofonzugriff an. Dann gilt:
+
+- „Aufnehmen & transkribieren (KI)“ und „Live-Diktat“ sind im Dropdown
+  ausgegraut. Beide Einträge haben den Tooltip „Mikrofon nicht verfügbar –
+  HTTPS oder localhost erforderlich“. Über HTTPS steht bei „Live-Diktat“
+  stattdessen „Nur in Chrome/Edge verfügbar“, wenn der Browser die Web Speech
+  API nicht kennt.
+- Ist keiner der beiden Modi verfügbar, sind auch der Hauptbutton und der
+  Dropdown-Pfeil deaktiviert. Der Hauptbutton zeigt dann denselben Tooltip.
+- Am Server liegt das nicht: Der Transkriptionsdienst wird erst nach der
+  Aufnahme aufgerufen.
+
+So funktioniert die Aufnahme:
+
+- **Dauerhaft:** Die Anwendung über HTTPS mit ihrem Hostnamen aufrufen. In AkV
+  beschreibt `docs/HTTPS-Zertifikat.md`, wie das Zertifikat per Let's Encrypt
+  für den LAN-Hostnamen eingerichtet wird.
+- **Nur zum Testen:** In Chrome unter
+  `chrome://flags/#unsafely-treat-insecure-origin-as-secure` die Adresse
+  (z. B. `http://192.168.x.y:8000`) eintragen und Chrome neu starten. Für den
+  Produktivbetrieb ist das nicht gedacht.
+- **Am Rechner selbst:** `http://localhost:8000` funktioniert ohne weitere
+  Einrichtung.
+
+**Eintrag „Aufnehmen & transkribieren“ fehlt ganz, statt ausgegraut zu sein?**
+Dann ist kein Transkriptionsdienst verfügbar. Entweder ist kein
+`AudioTranscriber` gebunden (z. B. weil der textbot nicht installiert ist),
+oder die Komponente ist ohne `transcribe` eingebunden.
+
+---
+
 ## Traits
 
 ### Searchable
